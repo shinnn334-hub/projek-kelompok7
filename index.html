@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kelompok 7 - Printer Sebagai Perangkat Output</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f6ff',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              900: '#0c4a6e',
+              glow: '#00f0ff',
+            }
+          },
+          animation: {
+            'pulse-glow': 'pulseGlow 2.5s infinite alternate',
+            'float': 'float 4s ease-in-out infinite',
+            'spin-slow': 'spin 12s linear infinite',
+            'spin-reverse': 'spinReverse 16s linear infinite',
+          },
+          keyframes: {
+            pulseGlow: {
+              '0%': { boxShadow: '0 0 15px rgba(14, 165, 233, 0.2), 0 0 30px rgba(0, 240, 255, 0.1)' },
+              '100%': { boxShadow: '0 0 30px rgba(14, 165, 233, 0.6), 0 0 60px rgba(0, 240, 255, 0.4)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px) rotateX(0deg)' },
+              '50%': { transform: 'translateY(-10px) rotateX(4deg)' },
+            },
+            spinReverse: {
+              '0%': { transform: 'rotate(0deg)' },
+              '100%': { transform: 'rotate(-360deg)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* CSS Grid Pattern Background */
+    .bg-grid-pattern {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+    
+    .bg-dots-pattern {
+      background-image: radial-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    /* Skeleton Shimmer CSS Keyframe */
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .skeleton-shimmer {
+      background: linear-gradient(90deg, #0f172a 25%, #1e293b 50%, #0f172a 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite ease-in-out;
+    }
+
+    /* 3D Perspective Utilities */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .preserve-3d {
+      transform-style: preserve-3d;
+    }
+
+    /* 3D Interactive Card Classes */
+    .card-3d-wrapper {
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease;
+      transform-style: preserve-3d;
+    }
+    
+    .card-3d-wrapper:hover {
+      transform: translateY(-10px) rotateX(6deg) rotateY(-4deg);
+      box-shadow: 0 25px 40px -15px rgba(14, 165, 233, 0.35);
+    }
+
+    .card-3d-child-depth {
+      transform: translateZ(30px);
+    }
+
+    /* Custom Glassmorphism */
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .glass-panel-glow {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      box-shadow: 0 0 30px rgba(14, 165, 233, 0.15);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #020617;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #38bdf8;
+    }
+
+    /* CSS 3D Model Animations for Printer Visuals */
+    @keyframes revolve3d {
+      0% { transform: rotateY(0deg) rotateX(10deg); }
+      50% { transform: rotateY(180deg) rotateX(-5deg); }
+      100% { transform: rotateY(360deg) rotateX(10deg); }
+    }
+    .revolve-3d {
+      animation: revolve3d 12s infinite linear;
+      transform-style: preserve-3d;
+    }
+
+    @keyframes laserScan {
+      0%, 100% { top: 10%; opacity: 0.2; }
+      50% { top: 85%; opacity: 0.9; }
+    }
+    .laser-beam {
+      animation: laserScan 2s infinite ease-in-out;
+    }
+
+    @keyframes inkjetSpritz {
+      0%, 100% { transform: translateX(-40px); }
+      50% { transform: translateX(40px); }
+    }
+    .nozzle-head {
+      animation: inkjetSpritz 1.8s infinite ease-in-out;
+    }
+
+    @keyframes layerBuild {
+      0% { height: 10%; }
+      100% { height: 85%; }
+    }
+    .build-object {
+      animation: layerBuild 4s infinite linear;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between overflow-x-hidden select-none bg-grid-pattern relative">
+
+  <!-- Ambient Glowing Orbs Background -->
+  <div class="fixed top-1/4 -left-32 w-96 h-96 bg-cyan-600/15 rounded-full blur-[120px] pointer-events-none z-0"></div>
+  <div class="fixed bottom-1/4 -right-32 w-96 h-96 bg-blue-600/15 rounded-full blur-[120px] pointer-events-none z-0"></div>
+
+  <!-- SKELETON SHIMMER OVERLAY (Active during phase transitions) -->
+  <div id="skeleton-overlay" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex-col justify-center items-center p-6">
+    <div class="w-full max-w-4xl space-y-6">
+      <div class="flex items-center space-x-4">
+        <div class="w-12 h-12 skeleton-shimmer rounded-xl"></div>
+        <div class="space-y-2 flex-1">
+          <div class="h-6 skeleton-shimmer rounded-md w-1/3"></div>
+          <div class="h-4 skeleton-shimmer rounded-md w-1/4"></div>
+        </div>
+      </div>
+      <div class="h-64 skeleton-shimmer rounded-2xl border border-slate-800/50"></div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="h-28 skeleton-shimmer rounded-xl"></div>
+        <div class="h-28 skeleton-shimmer rounded-xl"></div>
+        <div class="h-28 skeleton-shimmer rounded-xl"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GLOBAL HEADER (Nav Bar) -->
+  <header class="w-full px-6 py-4 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-xl sticky top-0 z-40 flex justify-between items-center">
+    <div class="flex items-center space-x-3 cursor-pointer" onclick="goToPhase(1)">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/30">
+        <i data-lucide="printer" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <span class="text-xs font-mono tracking-widest text-cyan-400 font-bold block uppercase">Output Device Presentation</span>
+        <h1 class="text-sm md:text-base font-extrabold text-white tracking-wide">KELOMPOK 7</h1>
+      </div>
+    </div>
+
+    <!-- Right Controls -->
+    <button onclick="resetPresentation()" title="Reset ke Lobby" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 active:scale-95 text-slate-400 hover:text-white border border-slate-800 rounded-lg text-xs font-mono transition flex items-center gap-1.5">
+      <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+    </button>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="flex-1 flex items-center justify-center p-4 md:p-8 relative z-10 min-h-[calc(100vh-140px)]">
+
+    <!-- ==================== PHASE 1: LOBBY / LANDING PAGE ==================== -->
+    <section id="phase-1" class="w-full max-w-5xl transition-all duration-700 block">
+      <div class="perspective-1000">
+        <div class="glass-panel-glow rounded-3xl p-8 md:p-14 relative overflow-hidden text-center space-y-8 animate-float">
+          
+          <!-- Decorative Futuristic Rings -->
+          <div class="absolute -top-24 -right-24 w-72 h-72 rounded-full border border-cyan-500/20 animate-spin-slow pointer-events-none"></div>
+          <div class="absolute -bottom-24 -left-24 w-72 h-72 rounded-full border border-blue-500/20 animate-spin-reverse pointer-events-none"></div>
+
+          <!-- Hero Icon & Tags -->
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-400 text-xs font-mono font-semibold tracking-wider uppercase">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+            Sistem Komputer & Perangkat Keras
+          </div>
+
+          <!-- Main Title -->
+          <div class="space-y-4 max-w-3xl mx-auto">
+            <h1 class="text-4xl md:text-6xl font-black text-white tracking-tight leading-tight">
+              Printer Sebagai <br/>
+              <span class="bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500 bg-clip-text text-transparent">
+                Perangkat Output
+              </span>
+            </h1>
+          </div>
+
+          <!-- CTA Button -->
+          <div class="pt-4">
+            <button onclick="goToPhase(2)" class="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-base rounded-2xl shadow-xl shadow-cyan-500/25 transition-all duration-300 transform active:scale-95 animate-pulse-glow">
+              <span class="flex items-center gap-3">
+                Mulai Presentasi
+                <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+              </span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PHASE 2: SEQUENTIAL MEMBER REVEAL ==================== -->
+    <section id="phase-2" class="w-full max-w-4xl transition-all duration-700 hidden">
+      <div class="glass-panel rounded-3xl p-6 md:p-10 space-y-8 border border-slate-800">
+        
+        <!-- Header Info -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800/80 pb-6 gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider mb-1">
+              <i data-lucide="users" class="w-4 h-4"></i> Tim Penyusun Materi
+            </div>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-white">Anggota Kelompok 7</h2>
+          </div>
+          <div class="bg-slate-900/90 px-4 py-2 rounded-xl border border-slate-800 text-xs font-mono">
+            Progres Pembukaan: <span id="member-counter" class="text-cyan-400 font-bold text-sm">1</span> / 5 Nama
+          </div>
+        </div>
+
+        <!-- Dynamic Member Cards Container -->
+        <div id="member-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Member 1 (Always Visible Initially in Phase 2) -->
+          <div id="member-card-1" class="member-card bg-slate-900/80 border border-cyan-500/40 p-4 rounded-2xl flex items-center space-x-4 shadow-lg shadow-cyan-500/10 transition-all duration-500">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-md font-mono">
+              01
+            </div>
+            <div>
+              <span class="text-[10px] font-mono text-cyan-400 tracking-wider block">ANGGOTA 1</span>
+              <h3 class="text-base font-bold text-white">Muhammad Rafi Al-Habsyi</h3>
+            </div>
+          </div>
+
+          <!-- Member 2 (Hidden) -->
+          <div id="member-card-2" class="member-card hidden opacity-0 translate-y-4 bg-slate-900/80 border border-slate-800 p-4 rounded-2xl flex items-center space-x-4 transition-all duration-500">
+            <div class="w-12 h-12 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-lg font-mono">
+              02
+            </div>
+            <div>
+              <span class="text-[10px] font-mono text-slate-500 tracking-wider block">ANGGOTA 2</span>
+              <h3 class="text-base font-bold text-white">Naufal Tri Hartanto</h3>
+            </div>
+          </div>
+
+          <!-- Member 3 (Hidden) -->
+          <div id="member-card-3" class="member-card hidden opacity-0 translate-y-4 bg-slate-900/80 border border-slate-800 p-4 rounded-2xl flex items-center space-x-4 transition-all duration-500">
+            <div class="w-12 h-12 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-lg font-mono">
+              03
+            </div>
+            <div>
+              <span class="text-[10px] font-mono text-slate-500 tracking-wider block">ANGGOTA 3</span>
+              <h3 class="text-base font-bold text-white">Muhammad Farhan Aunurrofiq</h3>
+            </div>
+          </div>
+
+          <!-- Member 4 (Hidden) -->
+          <div id="member-card-4" class="member-card hidden opacity-0 translate-y-4 bg-slate-900/80 border border-slate-800 p-4 rounded-2xl flex items-center space-x-4 transition-all duration-500">
+            <div class="w-12 h-12 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-lg font-mono">
+              04
+            </div>
+            <div>
+              <span class="text-[10px] font-mono text-slate-500 tracking-wider block">ANGGOTA 4</span>
+              <h3 class="text-base font-bold text-white">Yehezkiel Armada Sitorus</h3>
+            </div>
+          </div>
+
+          <!-- Member 5 (Hidden) -->
+          <div id="member-card-5" class="member-card hidden opacity-0 translate-y-4 bg-slate-900/80 border border-slate-800 p-4 rounded-2xl flex items-center space-x-4 transition-all duration-500">
+            <div class="w-12 h-12 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-lg font-mono">
+              05
+            </div>
+            <div>
+              <span class="text-[10px] font-mono text-slate-500 tracking-wider block">ANGGOTA 5</span>
+              <h3 class="text-base font-bold text-white">Andreansyah Fairuz</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Controls for Step-by-Step Reveal -->
+        <div class="pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <button id="btn-reveal-next" onclick="revealNextMember()" class="w-full sm:w-auto px-6 py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-semibold text-sm rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
+            <i data-lucide="user-plus" class="w-4 h-4 text-cyan-400"></i>
+            Anggota Selanjutnya
+          </button>
+
+          <button id="btn-to-hub" onclick="goToPhase(3)" disabled class="w-full sm:w-auto px-6 py-3 bg-cyan-600/40 text-slate-500 cursor-not-allowed font-bold text-sm rounded-xl transition flex items-center justify-center gap-2 shadow-lg">
+            Masuk ke Ruang Materi
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== PHASE 3: MATERIAL HUB (OVERVIEW ONLY) ==================== -->
+    <section id="phase-3" class="w-full max-w-6xl transition-all duration-700 hidden">
+      <div class="space-y-6">
+        
+        <!-- Hub Top Banner -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-800 pb-4 gap-2">
+          <div>
+            <span class="text-xs font-mono text-cyan-400 font-bold uppercase tracking-widest block">Ruang Utama Materi</span>
+            <h2 class="text-2xl md:text-4xl font-black text-white">Katalog Topik Pembahasan</h2>
+          </div>
+          <p class="text-xs md:text-sm text-slate-400">Klik pada kartu judul untuk membuka penjelasan detail &amp; visual 3D.</p>
+        </div>
+
+        <!-- 3D Grid Cards (Title Overview Only) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 perspective-1000">
+          
+          <!-- Card 1: Pengertian Printer -->
+          <div onclick="openModal('pengertian')" class="card-3d-wrapper cursor-pointer glass-panel border border-slate-800 hover:border-cyan-500/60 p-6 rounded-2xl relative overflow-hidden group">
+            <div class="card-3d-child-depth space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i data-lucide="cpu" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-mono text-cyan-400 uppercase font-semibold">Materi 01</span>
+                <h3 class="text-xl font-bold text-white group-hover:text-cyan-300 transition-colors">Pengertian Printer</h3>
+              </div>
+              <p class="text-xs text-slate-400 line-clamp-2">Konsep dasar printer sebagai perangkat keras output (hardcopy) pada sistem komputer.</p>
+              <div class="pt-2 flex items-center text-xs font-mono text-cyan-400 font-semibold group-hover:translate-x-1 transition-transform">
+                Buka Penjelasan <i data-lucide="chevron-right" class="w-4 h-4 ml-1"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Inkjet Printer -->
+          <div onclick="openModal('inkjet')" class="card-3d-wrapper cursor-pointer glass-panel border border-slate-800 hover:border-cyan-500/60 p-6 rounded-2xl relative overflow-hidden group">
+            <div class="card-3d-child-depth space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i data-lucide="droplets" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-mono text-cyan-400 uppercase font-semibold">Materi 02</span>
+                <h3 class="text-xl font-bold text-white group-hover:text-cyan-300 transition-colors">Inkjet Printer</h3>
+              </div>
+              <p class="text-xs text-slate-400 line-clamp-2">Teknologi semprotan tinta cair mikro untuk mencetak foto dan dokumen berkualitas tinggi.</p>
+              <div class="pt-2 flex items-center text-xs font-mono text-cyan-400 font-semibold group-hover:translate-x-1 transition-transform">
+                Buka Penjelasan <i data-lucide="chevron-right" class="w-4 h-4 ml-1"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Laser Printer -->
+          <div onclick="openModal('laser')" class="card-3d-wrapper cursor-pointer glass-panel border border-slate-800 hover:border-indigo-500/60 p-6 rounded-2xl relative overflow-hidden group">
+            <div class="card-3d-child-depth space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i data-lucide="zap" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-mono text-indigo-400 uppercase font-semibold">Materi 03</span>
+                <h3 class="text-xl font-bold text-white group-hover:text-indigo-300 transition-colors">Laser Printer</h3>
+              </div>
+              <p class="text-xs text-slate-400 line-clamp-2">Prinsip elektrostatik laser dan pencairan bubuk toner untuk kecepatan cetak tinggi.</p>
+              <div class="pt-2 flex items-center text-xs font-mono text-indigo-400 font-semibold group-hover:translate-x-1 transition-transform">
+                Buka Penjelasan <i data-lucide="chevron-right" class="w-4 h-4 ml-1"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Thermal Printer -->
+          <div onclick="openModal('thermal')" class="card-3d-wrapper cursor-pointer glass-panel border border-slate-800 hover:border-amber-500/60 p-6 rounded-2xl relative overflow-hidden group">
+            <div class="card-3d-child-depth space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i data-lucide="flame" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-mono text-amber-400 uppercase font-semibold">Materi 04</span>
+                <h3 class="text-xl font-bold text-white group-hover:text-amber-300 transition-colors">Thermal Printer</h3>
+              </div>
+              <p class="text-xs text-slate-400 line-clamp-2">Mekanisme pemanasan elemen kepala cetak pada kertas thermokromik sensitif panas.</p>
+              <div class="pt-2 flex items-center text-xs font-mono text-amber-400 font-semibold group-hover:translate-x-1 transition-transform">
+                Buka Penjelasan <i data-lucide="chevron-right" class="w-4 h-4 ml-1"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 5: 3D Printer -->
+          <div onclick="openModal('3dprinter')" class="card-3d-wrapper cursor-pointer glass-panel border border-slate-800 hover:border-emerald-500/60 p-6 rounded-2xl relative overflow-hidden group">
+            <div class="card-3d-child-depth space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i data-lucide="box" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-mono text-emerald-400 uppercase font-semibold">Materi 05</span>
+                <h3 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">3D Printer</h3>
+              </div>
+              <p class="text-xs text-slate-400 line-clamp-2">Teknologi manufaktur aditif untuk membentuk objek tiga dimensi dari filamen cair.</p>
+              <div class="pt-2 flex items-center text-xs font-mono text-emerald-400 font-semibold group-hover:translate-x-1 transition-transform">
+                Buka Penjelasan <i data-lucide="chevron-right" class="w-4 h-4 ml-1"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 6: Tabel Perbandingan Teknis -->
+          <div onclick="openModal('perbandingan')" class="card-3d-wrapper cursor-pointer glass-panel border border-slate-800 hover:border-blue-500/60 p-6 rounded-2xl relative overflow-hidden group">
+            <div class="card-3d-child-depth space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i data-lucide="table-properties" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-mono text-blue-400 uppercase font-semibold">Materi 06</span>
+                <h3 class="text-xl font-bold text-white group-hover:text-blue-300 transition-colors">Tabel Perbandingan</h3>
+              </div>
+              <p class="text-xs text-slate-400 line-clamp-2">Komparasi komprehensif aspek kecepatan, biaya, bahan baku, dan peruntukan.</p>
+              <div class="pt-2 flex items-center text-xs font-mono text-blue-400 font-semibold group-hover:translate-x-1 transition-transform">
+                Buka Tabel <i data-lucide="chevron-right" class="w-4 h-4 ml-1"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 7: Kesimpulan (Span 3 Columns on LG) -->
+          <div onclick="openModal('kesimpulan')" class="card-3d-wrapper cursor-pointer glass-panel border border-slate-800 hover:border-sky-500/60 p-6 rounded-2xl relative overflow-hidden group sm:col-span-2 lg:col-span-3">
+            <div class="card-3d-child-depth flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <span class="text-[10px] font-mono text-sky-400 uppercase font-semibold">Materi 07</span>
+                  <h3 class="text-xl font-bold text-white group-hover:text-sky-300 transition-colors">Kesimpulan &amp; Rangkuman</h3>
+                  <p class="text-xs text-slate-400">Ringkasan penutup dari seluruh pembahasan teknologi printer perangkat output.</p>
+                </div>
+              </div>
+              <div class="px-4 py-2 bg-sky-500/10 border border-sky-500/30 rounded-xl text-xs font-mono text-sky-300 font-bold flex items-center gap-2">
+                Lihat Rangkuman <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== PHASE 4: DRILL-DOWN MODAL DETAIL ==================== -->
+  <div id="detail-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl hidden flex-col justify-center items-center p-4 md:p-6 overflow-y-auto">
+    <div class="w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative space-y-6 my-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex justify-between items-start border-b border-slate-800 pb-4">
+        <div class="flex items-center space-x-3">
+          <div id="modal-icon-container" class="p-3 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded-xl">
+            <i data-lucide="info" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <span id="modal-tag" class="text-xs font-mono text-cyan-400 font-bold uppercase tracking-widest">Detail Pembahasan</span>
+            <h2 id="modal-title" class="text-2xl md:text-3xl font-extrabold text-white">Judul Materi</h2>
+          </div>
+        </div>
+
+        <!-- Back / Close Button -->
+        <button onclick="closeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 hover:text-white rounded-xl text-xs font-mono font-semibold transition flex items-center gap-2 border border-slate-700">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Ruang Materi
+        </button>
+      </div>
+
+      <!-- Modal Body Dynamic Content -->
+      <div id="modal-body" class="space-y-6 text-slate-300 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2">
+        <!-- Content Injected via JavaScript -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="pt-4 border-t border-slate-800 flex justify-between items-center text-xs font-mono text-slate-500">
+        <span>Kelompok 7 • Presentasi Printer</span>
+        <button onclick="closeModal()" class="text-cyan-400 hover:underline">Kembali ↑</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="w-full px-6 py-3 border-t border-slate-800/80 bg-slate-950/80 backdrop-blur-md text-center text-xs font-mono text-slate-500">
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // State Management
+    let currentPhase = 1;
+    let revealedMembersCount = 1;
+
+    // Member Names List
+    const membersList = [
+      "Muhammad Rafi Al-Habsyi",
+      "Naufal Tri Hartanto",
+      "Muhammad Farhan Aunurrofiq",
+      "Yehezkiel Armada Sitorus",
+      "Andreansyah Fairuz"
+    ];
+
+    // Initialize Lucide Icons on Load
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+    });
+
+    // Phase Switcher with Skeleton Shimmer Animation
+    function goToPhase(targetPhase) {
+      const skeleton = document.getElementById('skeleton-overlay');
+      skeleton.classList.remove('hidden');
+      skeleton.classList.add('flex');
+
+      setTimeout(() => {
+        // Hide all phase sections
+        document.getElementById('phase-1').classList.add('hidden');
+        document.getElementById('phase-2').classList.add('hidden');
+        document.getElementById('phase-3').classList.add('hidden');
+
+        // Show target phase
+        document.getElementById(`phase-${targetPhase}`).classList.remove('hidden');
+
+        currentPhase = targetPhase;
+
+        // Hide Skeleton
+        skeleton.classList.remove('flex');
+        skeleton.classList.add('hidden');
+        
+        // Re-initialize Lucide icons if required
+        lucide.createIcons();
+      }, 600); // 600ms shimmer delay
+    }
+
+    // Sequential Step-by-Step Member Reveal
+    function revealNextMember() {
+      if (revealedMembersCount < 5) {
+        revealedMembersCount++;
+        const nextCard = document.getElementById(`member-card-${revealedMembersCount}`);
+        
+        nextCard.classList.remove('hidden');
+        setTimeout(() => {
+          nextCard.classList.remove('opacity-0', 'translate-y-4');
+          nextCard.classList.add('opacity-100', 'translate-y-0', 'border-cyan-500/40');
+        }, 50);
+
+        document.getElementById('member-counter').innerText = revealedMembersCount;
+
+        // If all 5 revealed, enable Hub Button
+        if (revealedMembersCount === 5) {
+          const btnToHub = document.getElementById('btn-to-hub');
+          btnToHub.disabled = false;
+          btnToHub.className = "w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-sm rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-95 animate-pulse";
+          
+          const btnReveal = document.getElementById('btn-reveal-next');
+          btnReveal.disabled = true;
+          btnReveal.classList.add('opacity-40', 'cursor-not-allowed');
+        }
+      }
+    }
+
+    // Reset Presentation State
+    function resetPresentation() {
+      revealedMembersCount = 1;
+      document.getElementById('member-counter').innerText = 1;
+
+      // Reset Member Cards
+      for (let i = 2; i <= 5; i++) {
+        const card = document.getElementById(`member-card-${i}`);
+        card.classList.add('hidden', 'opacity-0', 'translate-y-4');
+        card.classList.remove('opacity-100', 'translate-y-0');
+      }
+
+      const btnToHub = document.getElementById('btn-to-hub');
+      btnToHub.disabled = true;
+      btnToHub.className = "w-full sm:w-auto px-6 py-3 bg-cyan-600/40 text-slate-500 cursor-not-allowed font-bold text-sm rounded-xl transition flex items-center justify-center gap-2 shadow-lg";
+
+      const btnReveal = document.getElementById('btn-reveal-next');
+      btnReveal.disabled = false;
+      btnReveal.classList.remove('opacity-40', 'cursor-not-allowed');
+
+      goToPhase(1);
+    }
+
+    // Dynamic Modal Content Database
+    const modalData = {
+      pengertian: {
+        title: "Pengertian Printer (Perangkat Output)",
+        tag: "Materi 01 • Konsep Dasar",
+        icon: "cpu",
+        color: "cyan",
+        html: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <div class="space-y-4">
+              <h4 class="text-lg font-bold text-white">Apa itu Perangkat Output Printer?</h4>
+              <p class="text-slate-300">
+                Printer adalah perangkat keras (hardware) komputer yang berfungsi untuk menghasil materi cetakan fisik (hardcopy) berupa teks, gambar, atau objek tiga dimensi dari data digital yang diproses oleh CPU.
+              </p>
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                <span class="text-xs font-mono text-cyan-400 font-bold block">FUNGSI UTAMA:</span>
+                <ul class="list-disc list-inside text-xs text-slate-400 space-y-1">
+                  <li>Mengubah sinyal elektrik digital menjadi salinan fisik.</li>
+                  <li>Penyedia dokumentasi legal &amp; arsip fisik.</li>
+                  <li>Media visualisasi ide manufaktur (3D).</li>
+                </ul>
+              </div>
+            </div>
+            
+            <!-- 3D Conceptual Model Graphic -->
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[220px] relative overflow-hidden">
+              <div class="w-32 h-32 border-2 border-cyan-500/40 rounded-xl revolve-3d flex items-center justify-center bg-cyan-950/20">
+                <i data-lucide="printer" class="w-12 h-12 text-cyan-400"></i>
+              </div>
+              <span class="text-[10px] font-mono text-slate-500 mt-4 uppercase tracking-widest">3D Data Output Stream</span>
+            </div>
+          </div>
+        `
+      },
+      inkjet: {
+        title: "Inkjet Printer",
+        tag: "Materi 02 • Teknologi Tinta Cair",
+        icon: "droplets",
+        color: "cyan",
+        html: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <h4 class="text-lg font-bold text-white">Mekanisme Kerja Inkjet</h4>
+              <p>
+                Printer Inkjet mencetak dengan cara menyemprotkan titik-titik tinta cair mikroskopis melalui nozel kecil pada kepala cetak (print head) langsung ke atas permukaan kertas.
+              </p>
+              <div class="space-y-2">
+                <h5 class="text-xs font-mono font-bold text-cyan-400">KELEBIHAN &amp; KEKURANGAN</h5>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <div class="bg-emerald-950/30 border border-emerald-800/40 p-2.5 rounded-lg">
+                    <span class="text-emerald-400 font-bold block">✓ Kelebihan</span>
+                    Hasil foto tajam, gradasi warna halus, harga awal terjangkau.
+                  </div>
+                  <div class="bg-rose-950/30 border border-rose-800/40 p-2.5 rounded-lg">
+                    <span class="text-rose-400 font-bold block">✗ Kekurangan</span>
+                    Tinta relatif mudah luntur jika basah, cetak dokumen masal lebih lambat.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3D Interactive Nozzle Simulation -->
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden">
+              <div class="w-full h-32 relative flex items-center justify-center border-b border-slate-800">
+                <!-- Moving Nozzle Head -->
+                <div class="nozzle-head absolute top-4 w-12 h-8 bg-cyan-500 rounded-lg flex items-center justify-center text-slate-950 font-bold shadow-lg shadow-cyan-500/50">
+                  <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                </div>
+                <!-- Ink Drops -->
+                <div class="absolute bottom-2 flex space-x-3">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400 animate-bounce"></span>
+                  <span class="w-2 h-2 rounded-full bg-sky-400 animate-bounce delay-100"></span>
+                  <span class="w-2 h-2 rounded-full bg-blue-400 animate-bounce delay-200"></span>
+                </div>
+              </div>
+              <span class="text-[10px] font-mono text-slate-500 mt-3 uppercase tracking-widest">Simulasi Nozel Semprot Tinta</span>
+            </div>
+          </div>
+        `
+      },
+      laser: {
+        title: "Laser Printer",
+        tag: "Materi 03 • Elektrostatik & Toner",
+        icon: "zap",
+        color: "indigo",
+        html: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <h4 class="text-lg font-bold text-white">Prinsip Elektrostatik Laser</h4>
+              <p>
+                Printer Laser menggunakan Sinar Laser untuk menggambar pola dokumen pada Drum fotosensitif yang bermuatan listrik statis. Bubuk Toner (tinta kering) melekat pada muatan tersebut lalu dilelehkan ke kertas menggunakan pemanas (fuser).
+              </p>
+              <div class="space-y-2">
+                <h5 class="text-xs font-mono font-bold text-indigo-400">KARAKTERISTIK UTAMA</h5>
+                <ul class="list-disc list-inside text-xs text-slate-400 space-y-1">
+                  <li>Kecepatan cetak sangat tinggi (hingga 50+ lembar/menit).</li>
+                  <li>Hasil cetak teks presisi &amp; anti air.</li>
+                  <li>Sangat hemat untuk volume dokumen perkantoran besar.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- 3D Laser Scanning Visualizer -->
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden">
+              <div class="w-40 h-32 border-2 border-indigo-500/40 rounded-xl relative flex items-center justify-center bg-indigo-950/20">
+                <div class="w-24 h-24 rounded-full border-4 border-slate-700 animate-spin"></div>
+                <!-- Laser Beam line -->
+                <div class="laser-beam absolute w-full h-0.5 bg-indigo-400 shadow-[0_0_10px_#818cf8]"></div>
+              </div>
+              <span class="text-[10px] font-mono text-slate-500 mt-3 uppercase tracking-widest">Visualisasi Drum Laser &amp; Laser Beam</span>
+            </div>
+          </div>
+        `
+      },
+      thermal: {
+        title: "Thermal Printer",
+        tag: "Materi 04 • Panas Thermokromik",
+        icon: "flame",
+        color: "amber",
+        html: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <h4 class="text-lg font-bold text-white">Cara Kerja Thermal</h4>
+              <p>
+                Printer Thermal mencetak tanpa menggunakan tinta cair maupun toner. Pin pemanas pada kepala cetak menekan Kertas Thermal khusus yang akan berubah warna menjadi hitam saat terkena elemen panas.
+              </p>
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                <span class="text-xs font-mono text-amber-400 font-bold block">APLIKASI PENGGUNAAN:</span>
+                <p class="text-xs text-slate-400">
+                  Struk kasir POS, mesin ATM, label resi pengiriman ekspedisi, dan tiket antrean.
+                </p>
+              </div>
+            </div>
+
+            <!-- Thermal Heat Grid Simulation -->
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden">
+              <div class="w-36 h-28 bg-slate-900 border border-slate-700 rounded-lg p-3 flex flex-col justify-between">
+                <div class="flex space-x-1 justify-center">
+                  <span class="w-3 h-3 rounded-full bg-amber-500 animate-ping"></span>
+                  <span class="w-3 h-3 rounded-full bg-amber-500 animate-ping delay-75"></span>
+                  <span class="w-3 h-3 rounded-full bg-amber-500 animate-ping delay-150"></span>
+                </div>
+                <div class="bg-white text-slate-950 p-1 text-[8px] font-mono text-center font-bold rounded">
+                  STRUK KASIR THERMAL
+                </div>
+              </div>
+              <span class="text-[10px] font-mono text-slate-500 mt-3 uppercase tracking-widest">Pin Pemanas Thermal Head</span>
+            </div>
+          </div>
+        `
+      },
+      '3dprinter': {
+        title: "3D Printer",
+        tag: "Materi 05 • Manufaktur Aditif",
+        icon: "box",
+        color: "emerald",
+        html: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <h4 class="text-lg font-bold text-white">Revolusi Manufaktur 3D</h4>
+              <p>
+                3D Printer membuat benda tiga dimensi nyata dari desain CAD digital dengan menumpuk material (filamen plastik PLA/ABS atau resin) lapis demi lapis (layer-by-layer) melalui nozel ekstruder panas.
+              </p>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                  <span class="text-emerald-400 font-mono font-bold block">Material:</span>
+                  PLA, ABS, TPU, Resin.
+                </div>
+                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                  <span class="text-emerald-400 font-mono font-bold block">Bidang:</span>
+                  Prototipe, Medis, Arsitektur.
+                </div>
+              </div>
+            </div>
+
+            <!-- 3D Printer Bed & Extruder Simulation -->
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden">
+              <div class="w-36 h-32 border border-emerald-500/30 rounded-xl relative flex flex-col items-center justify-end p-2 bg-emerald-950/10">
+                <!-- Extruder Head -->
+                <div class="absolute top-2 w-8 h-6 bg-emerald-500 rounded text-[9px] font-bold text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-500/50">
+                  3D
+                </div>
+                <!-- Building Object Layer -->
+                <div class="build-object w-16 bg-emerald-400/80 rounded-t-md shadow-[0_0_15px_#34d399]"></div>
+              </div>
+              <span class="text-[10px] font-mono text-slate-500 mt-3 uppercase tracking-widest">Layer-by-Layer Additive Build</span>
+            </div>
+          </div>
+        `
+      },
+      perbandingan: {
+        title: "Tabel Perbandingan Teknis",
+        tag: "Materi 06 • Komparasi Spesifikasi",
+        icon: "table-properties",
+        color: "blue",
+        html: `
+          <div class="overflow-x-auto border border-slate-800 rounded-2xl">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-950 text-slate-400 font-mono uppercase border-b border-slate-800">
+                <tr>
+                  <th class="p-3">Teknologi</th>
+                  <th class="p-3">Bahan Konsumsi</th>
+                  <th class="p-3">Kecepatan</th>
+                  <th class="p-3">Biaya Cetak</th>
+                  <th class="p-3">Penggunaan Utama</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800 text-slate-300">
+                <tr class="hover:bg-slate-800/40">
+                  <td class="p-3 font-bold text-cyan-400">Inkjet</td>
+                  <td class="p-3">Tinta Cair (Liquid Ink)</td>
+                  <td class="p-3">Sedang (10-20 ppm)</td>
+                  <td class="p-3">Sedang</td>
+                  <td class="p-3">Dokumen Warna &amp; Foto</td>
+                </tr>
+                <tr class="hover:bg-slate-800/40">
+                  <td class="p-3 font-bold text-indigo-400">Laser</td>
+                  <td class="p-3">Bubuk Toner (Dry Powder)</td>
+                  <td class="p-3">Sangat Tinggi (30-50 ppm)</td>
+                  <td class="p-3">Sangat Murah/Lembar</td>
+                  <td class="p-3">Dokumen Kantor Masal</td>
+                </tr>
+                <tr class="hover:bg-slate-800/40">
+                  <td class="p-3 font-bold text-amber-400">Thermal</td>
+                  <td class="p-3">Kertas Thermal Sensitive</td>
+                  <td class="p-3">Tinggi (Instan)</td>
+                  <td class="p-3">Sangat Hemat (Tanpa Tinta)</td>
+                  <td class="p-3">Struk Kasir &amp; Label Resi</td>
+                </tr>
+                <tr class="hover:bg-slate-800/40">
+                  <td class="p-3 font-bold text-emerald-400">3D Printer</td>
+                  <td class="p-3">Filamen Plastik / Resin</td>
+                  <td class="p-3">Lambat (Hitungan Jam)</td>
+                  <td class="p-3">Bervariasi (Tinggi)</td>
+                  <td class="p-3">Objek Fisik 3D &amp; Prototipe</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        `
+      },
+      kesimpulan: {
+        title: "Kesimpulan & Rangkuman",
+        tag: "Materi 07 • Penutup Presentasi",
+        icon: "check-circle-2",
+        color: "sky",
+        html: `
+          <div class="space-y-4 text-center max-w-2xl mx-auto py-4">
+            <div class="w-16 h-16 bg-sky-500/10 border border-sky-500/30 text-sky-400 rounded-full flex items-center justify-center mx-auto mb-2">
+              <i data-lucide="award" class="w-8 h-8"></i>
+            </div>
+            <h4 class="text-xl font-bold text-white">Ringkasan Kelompok 7</h4>
+            <p class="text-slate-300 leading-relaxed text-sm">
+              Printer telah berkembang dari sekadar alat pencetak dokumen teks biasa menjadi perangkat output multi-domain. Pemilihan jenis printer harus disesuaikan dengan kebutuhan: <span class="text-cyan-400 font-semibold">Inkjet</span> untuk kualitas foto, <span class="text-indigo-400 font-semibold">Laser</span> untuk kuantitas kantor, <span class="text-amber-400 font-semibold">Thermal</span> untuk kecepatan transaksi kasir, serta <span class="text-emerald-400 font-semibold">3D Printer</span> untuk penciptaan produk fisik.
+            </p>
+            <div class="pt-4 border-t border-slate-800 flex justify-center items-center gap-2">
+              <span class="px-3 py-1 bg-slate-800 rounded-full text-xs font-mono text-slate-400">Terima Kasih Atas Perhatiannya</span>
+            </div>
+          </div>
+        `
+      }
+    };
+
+    // Open Drill-Down Modal
+    function openModal(key) {
+      const data = modalData[key];
+      if (!data) return;
+
+      document.getElementById('modal-title').innerText = data.title;
+      document.getElementById('modal-tag').innerText = data.tag;
+      document.getElementById('modal-body').innerHTML = data.html;
+
+      const modal = document.getElementById('detail-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      lucide.createIcons();
+    }
+
+    // Close Modal
+    function closeModal() {
+      const modal = document.getElementById('detail-modal');
+      modal.classList.remove('flex');
+      modal.classList.add('hidden');
+    }
+  </script>
+
+</body>
+</html>
